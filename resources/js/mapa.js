@@ -1,8 +1,12 @@
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
+const provider = new OpenStreetMapProvider();
+
 document.addEventListener('DOMContentLoaded', () => {
 
     if (document.querySelector('#mapa')) {
         const lat = 17.060729;
         const lng = -96.7317606;
+        const apikey = "AAPKe683b484dd044a41b1d39c5a5dae0a6aHrp5xGfOuWfDANwICfjp0-USxW6FX1j8R-r_LjI5En9sx_eNg9r7Mflc__wuTvgX";
 
         const mapa = L.map('mapa').setView([lat, lng], 16);
 
@@ -13,6 +17,83 @@ document.addEventListener('DOMContentLoaded', () => {
         let marker;
 
         // agregar el pin
-        marker = new L.marker([lat, lng]).addTo(mapa);
+        marker = new L.marker([lat, lng],{
+            draggable: true, //mover marcador
+            autoPan: true,   //mover marcador y mapa
+        }).addTo(mapa);
+
+        //geocode service
+       // const geocodeService = L.esri.Geocoding.geocodeService();
+
+        var geocodeService = L.esri.Geocoding.geocodeService({
+            apikey: apikey
+        });
+
+        //Buscador de direcciones
+        const buscador = document.querySelector('#formBuscador');
+        buscador.addEventListener('blur', buscarDireccion);
+
+        //detectar movimiento del marker
+        marker.on('moveend', function(e){
+            //console.log('soltaste el pin');
+            marker = e.target;
+
+            //console.log(marker.getLatLng());
+            const posicion = marker.getLatLng()
+
+            console.log(posicion);
+
+            //centrar automaticamente el mapa
+            mapa.panTo(new L.LatLng( posicion.lat, posicion.lng));
+
+            //Reverse Geocoding, cuando el usuario reubica el pin
+            geocodeService.reverse().latlng(posicion,16).run(function(error,resultado){
+                //console.log(error);
+
+                //console.log(resultado.address);
+
+                marker.bindPopup(resultado.address.LongLabel);
+                marker.openPopup();
+
+                //llenar los campos
+                llenarInputs(resultado);
+            })
+
+        });
+
+        function buscarDireccion(e){
+            if (e.target.value.length > 1) {
+                provider.search({query: e.target.value + ' Oaxaca MX '})
+                    .then(resultado => {
+                        if (resultado) {
+                            //console.log(resultado[0].bounds[0])
+                            geocodeService.reverse().latlng(resultado[0].bounds[0],16).run(function(error,resultado){
+                                //llenar los campos
+                                llenarInputs(resultado);
+
+                                //centrar el mapa
+                                mapa.setView(resultado.latlng)
+
+                                //agregar el pin
+
+                                //mover el pin
+
+                                console.log(resultado);
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
+            }
+        }
+
+        function llenarInputs(resultado){
+            document.querySelector('#direccion').value = resultado.address.Address || '';
+            document.querySelector('#colonia').value = resultado.address.Neighborhood || '';
+            document.querySelector('#lat').value = resultado.latlng.lat || '';
+            document.querySelector('#lng').value = resultado.latlng.lng || '';
+
+        }
     }
 });

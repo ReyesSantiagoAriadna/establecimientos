@@ -4,6 +4,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
     integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
     crossorigin=""/>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css"
+    />
 @endsection
 
 @section('content')
@@ -68,20 +73,53 @@
                     <legend class="text-primary">Ubicación: </legend>
 
                     <div class="form-group">
-                        <label for="nombre">Coloca la dirección del Establecimiento</label>
+                        <label for="formBuscador">Coloca la dirección del Establecimiento</label>
                         <input
                             id="formBuscador" type="text"
                             placeholder="Calle del Establecimiento"
                             class="form-control"
                         >
                         <p class="text-secondary mt-5 mb-3 text-center">
-                            El asistente colocará una dirección estimada, mueve el Pin hacia el lugar correcto
+                            El asistente colocará una dirección estimada o mueve el Pin hacia el lugar correcto
                         </p>
                     </div>
 
                     <div class="form-group">
                         <div id="mapa" style="height: 400px"></div>
                     </div>
+
+                    <p class="informacion">Confirma que los siguientes campos son correctos</p>
+
+                    <div class="form-group">
+                        <label for="direccion">Direcciíon</label>
+                        <input type="text" id="direccion"
+                              class="form-control @error('direccon') is-invalid @enderror"
+                              placeholder="Dirección"
+                              value="{{ old('direccion') }}"
+                        >
+                        @error('direccion')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="colonia">Colonia</label>
+                        <input type="text" id="colonia"
+                              class="form-control @error('colonia') is-invalid @enderror"
+                              placeholder="Colonia"
+                              value="{{ old('Colonia') }}"
+                        >
+                        @error('colonia')
+                            <div class="invalid-feedback">
+                                {{$message}}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <input type="hidden" id="lat" name="lat" value="{{ old('lat') }}">
+                    <input type="hidden" id="lng" name="lng" value="{{ old('lng') }}">
                 </fieldset>
             </form>
         </div>
@@ -90,8 +128,11 @@
 
 @section('scripts')
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-        crossorigin="">
-    </script>
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+
+    <script src="https://unpkg.com/esri-leaflet" defer></script>
+    <script src="https://unpkg.com/esri-leaflet-geocoder" defer></script>
+
 
 @endsection
