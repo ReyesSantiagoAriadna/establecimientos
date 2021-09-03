@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const mapa = L.map('mapa').setView([lat, lng], 16);
 
+        //eliminar pines previos
+        let markers = new L.FeatureGroup().addTo(mapa);
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(mapa);
@@ -22,6 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
             autoPan: true,   //mover marcador y mapa
         }).addTo(mapa);
 
+        markers.addLayer(marker);
+
         //geocode service
        // const geocodeService = L.esri.Geocoding.geocodeService();
 
@@ -33,39 +38,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const buscador = document.querySelector('#formBuscador');
         buscador.addEventListener('blur', buscarDireccion);
 
-        //detectar movimiento del marker
-        marker.on('moveend', function(e){
-            //console.log('soltaste el pin');
-            marker = e.target;
+        reubicarPin(marker);
 
-            //console.log(marker.getLatLng());
-            const posicion = marker.getLatLng()
+        function reubicarPin(marker){
+             //detectar movimiento del marker
+            marker.on('moveend', function(e){
+                //console.log('soltaste el pin');
+                marker = e.target;
 
-            console.log(posicion);
+                //console.log(marker.getLatLng());
+                const posicion = marker.getLatLng()
 
-            //centrar automaticamente el mapa
-            mapa.panTo(new L.LatLng( posicion.lat, posicion.lng));
+                console.log(posicion);
 
-            //Reverse Geocoding, cuando el usuario reubica el pin
-            geocodeService.reverse().latlng(posicion,16).run(function(error,resultado){
-                //console.log(error);
+                //centrar automaticamente el mapa
+                mapa.panTo(new L.LatLng( posicion.lat, posicion.lng));
 
-                //console.log(resultado.address);
+                //Reverse Geocoding, cuando el usuario reubica el pin
+                geocodeService.reverse().latlng(posicion,16).run(function(error,resultado){
+                    //console.log(error);
 
-                marker.bindPopup(resultado.address.LongLabel);
-                marker.openPopup();
+                    //console.log(resultado.address);
 
-                //llenar los campos
-                llenarInputs(resultado);
-            })
+                    marker.bindPopup(resultado.address.LongLabel);
+                    marker.openPopup();
 
-        });
+                    //llenar los campos
+                    llenarInputs(resultado);
+                })
+
+            });
+
+        }
+
 
         function buscarDireccion(e){
             if (e.target.value.length > 1) {
                 provider.search({query: e.target.value + ' Oaxaca MX '})
                     .then(resultado => {
                         if (resultado) {
+                            //limpiar lo pines previos
+                            markers.clearLayers();
+
                             //console.log(resultado[0].bounds[0])
                             geocodeService.reverse().latlng(resultado[0].bounds[0],16).run(function(error,resultado){
                                 //llenar los campos
@@ -75,10 +89,16 @@ document.addEventListener('DOMContentLoaded', () => {
                                 mapa.setView(resultado.latlng)
 
                                 //agregar el pin
+                                marker = new L.marker(resultado.latlng,{
+                                    draggable: true, //mover marcador
+                                    autoPan: true,   //mover marcador y mapa
+                                }).addTo(mapa);
+
+                                //asignar el contenido de markers  al nuevo pin
+                                markers.addLayer(marker);
 
                                 //mover el pin
-
-                                console.log(resultado);
+                                reubicarPin(marker); 
                             })
                         }
                     })
