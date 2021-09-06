@@ -4,8 +4,8 @@ const provider = new OpenStreetMapProvider();
 document.addEventListener('DOMContentLoaded', () => {
 
     if (document.querySelector('#mapa')) {
-        const lat = 17.060729;
-        const lng = -96.7317606;
+        const lat = document.querySelector('#lat').value === '' ? 17.060729 : document.querySelector('#lat').value;
+        const lng = document.querySelector('#lng').value === '' ? -96.7317606 : document.querySelector('#lng').value;
         const apikey = "AAPKe683b484dd044a41b1d39c5a5dae0a6aHrp5xGfOuWfDANwICfjp0-USxW6FX1j8R-r_LjI5En9sx_eNg9r7Mflc__wuTvgX";
 
         const mapa = L.map('mapa').setView([lat, lng], 16);
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 markers.addLayer(marker);
 
                                 //mover el pin
-                                reubicarPin(marker); 
+                                reubicarPin(marker);
                             })
                         }
                     })

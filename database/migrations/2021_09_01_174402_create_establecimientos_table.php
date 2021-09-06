@@ -28,7 +28,7 @@ class CreateEstablecimientosTable extends Migration
             $table->string('direccion');
             $table->string('colonia');
             $table->string('lat');
-            $table->string('lgn');
+            $table->string('lng');
             $table->string('telefono');
             $table->text('descripcion');
             $table->time('apertura');
