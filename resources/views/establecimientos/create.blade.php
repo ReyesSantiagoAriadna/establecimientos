@@ -18,7 +18,10 @@
         <h1 class="text-center mt-4">Registrar establecimiento</h1>
 
         <div class="mt-5 row justify-content-center">
-            <form action="" method="POST" class="col-md-9 col-xs-12 card card-body">
+            <form action="{{ route('establecimiento.store') }}" method="POST" enctype="multipart/form-data" class="col-md-9 col-xs-12 card card-body">
+
+                @csrf
+
                 <fieldset class="border p-4">
                     <legend class="text-primary">Nombre, Categoría e Imagen Principal</legend>
 
@@ -98,6 +101,7 @@
                               class="form-control @error('direccon') is-invalid @enderror"
                               placeholder="Dirección"
                               value="{{ old('direccion') }}"
+                              name="direccion"
                         >
                         @error('direccion')
                             <div class="invalid-feedback">
@@ -112,6 +116,7 @@
                               class="form-control @error('colonia') is-invalid @enderror"
                               placeholder="Colonia"
                               value="{{ old('Colonia') }}"
+                              name="colonia"
                         >
                         @error('colonia')
                             <div class="invalid-feedback">
