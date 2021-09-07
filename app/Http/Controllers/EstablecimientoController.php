@@ -62,7 +62,7 @@ class EstablecimientoController extends Controller
          $establecimiento->user_id = auth()->user()->id;
          $establecimiento->save();
 
-        return back()->with('estado', 'Tú informacción de salmacenó correctamente');
+        return back()->with('estado', 'Tú informacción de almacenó correctamente');
     }
 
     /**
